@@ -43,6 +43,7 @@ class TileState:
     def __init__(self, enumList):
         self.state = enumList
 
+
 class Board:
     """
     self.boardArray is a 2d array, where even indices are centers of squares, and odd indices are between squares (containing wall data)
