@@ -6,7 +6,6 @@ class TileEnum(Enum):
     EMPTY = 1
     WALL = 2
     SYMBOL = 3
-    ROBOT = 4
 
 
 class SymbolEnum(Enum):
@@ -29,6 +28,9 @@ class SymbolEnum(Enum):
     YELLOW_HEXAGON = 16
     WILDCARD = 17
 
+    def toString(self):
+        return chr(self.value + ord("A") - 1)
+
 
 class RobotEnum(Enum):
     UNDEFINED = 0
@@ -40,17 +42,83 @@ class RobotEnum(Enum):
 
 
 class TileState:
-    def __init__(self, enumList):
-        self.state = enumList
+    def __init__(self, enum, value=None):
+        self.enum = enum
+        self.value = value
+    
+    def getEnum(self):
+        return self.enum
+    
+    def getValue(self):
+        return self.value
 
 
 class Board:
     """
-    self.boardArray is a 2d array, where even indices are centers of squares, and odd indices are between squares (containing wall data)
+    self.boardArray is a 2d array, where odd indices are centers of squares, and even indices are between squares (wall data)
+
+    key for translation:
+    0: blank
+    1: wall
+    A-Q: symbol tokens (A -> SymbolEnum 1, B -> SymbolEnum 2, etc.) 
     """
+
+    SIZE = 33
+
     def __init__(self):
         self.board = self._blankBoard()
         
 
-    def _blankBoard():
-        pass
+    def _blankBoard(self):
+        board = []
+        allWallRow = [TileState(TileEnum.WALL)] * Board.SIZE
+        edgeWallRow = [TileState(TileEnum.WALL)] + ([TileState(TileEnum.EMPTY)] * (Board.SIZE - 2)) + [TileState(TileEnum.WALL)]
+        board.append(allWallRow)
+        for _ in range(Board.SIZE - 2):
+            board.append(edgeWallRow)
+        board.append(allWallRow)
+        return board
+    
+
+    def importBoard(self, stringBoard):
+        board = []
+        for strRow in stringBoard.split("\n"):
+            boardRow = []
+            for char in strRow:
+                if char == "X" or char == "1":
+                    boardRow.append(TileState(TileEnum.WALL))
+                elif char == " " or char == "0":
+                    boardRow.append(TileState(TileEnum.EMPTY))
+                else:
+                    enumIdx = ord(char) - ord("A") + 1
+                    boardRow.append(TileState(TileEnum.SYMBOL, SymbolEnum(enumIdx)))
+            board.append(boardRow)
+
+        self.board = board
+        return board
+
+
+    def toString(self):
+        output = ""
+        for row in self.board:
+            outputRow = ""
+            for tile in row:
+                enum = tile.getEnum()
+                if enum == TileEnum.EMPTY:
+                    outputRow += " "
+                elif enum == TileEnum.WALL:
+                    outputRow += "X"
+                elif enum == TileEnum.SYMBOL:
+                    outputRow += tile.getValue().toString()
+            output += outputRow + "\n"
+
+        return output
+
+
+gameBoard = Board()
+
+fp = open('board.txt', 'r')
+text = fp.read()
+
+gameBoard.importBoard(text)
+print(gameBoard.toString())
