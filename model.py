@@ -56,8 +56,9 @@ class TileState:
 class Board:
     """
     self.boardArray is a 2d array, where odd indices are centers of squares, and even indices are between squares (wall data)
-
+    e.g. (1, 15) is a valid location for a robot, but (2, 8) and (5, 2) are not 
     key for translation:
+
     0: blank
     1: wall
     A-Q: symbol tokens (A -> SymbolEnum 1, B -> SymbolEnum 2, etc.) 
@@ -67,7 +68,7 @@ class Board:
 
     def __init__(self):
         self.board = self._blankBoard()
-        
+        self.robots = {}  # a map of robot by enum to their location (row, col) on the board
 
     def _blankBoard(self):
         board = []
