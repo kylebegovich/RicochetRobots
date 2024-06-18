@@ -208,7 +208,7 @@ class Board:
         if row < 1 or row >= self.SIZE or col < 1 or col >= self.SIZE:
             return None
         
-        adjTilePos = (row, col)
+        adjTilePos = [row, col]
         if dirEnum == DirEnum.UP:
             adjTilePos[0] -= 1
         elif dirEnum == DirEnum.DOWN:
@@ -220,7 +220,7 @@ class Board:
 
         adjTile = self.board[adjTilePos[0]][adjTilePos[1]]
         # blocked by a wall
-        if adjTile == TileEnum.WALL:
+        if adjTile.enum == TileEnum.WALL:
             return False
         
         for pos in self.robots.values():

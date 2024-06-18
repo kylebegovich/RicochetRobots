@@ -1,5 +1,14 @@
 from model import *
-import difflib
+
+
+def getTestBoard():
+    gameBoard = Board()
+    fp = open('boardWithRobots.txt', 'r')
+    text = fp.read()
+
+    gameBoard.importBoard(text)
+    return gameBoard
+
 
 def testRobotAndSymbolEnums():
     print("testRobotAndSymbolEnums:")
@@ -27,26 +36,18 @@ def testRobotAndSymbolEnums():
 
 def testBoardToStringInversion():
     print("testBoardToStringInversion")
-    gameBoard = Board()
-    fp = open('board.txt', 'r')
-    text = fp.read()
+    testBoard = getTestBoard()
 
-    gameBoard.importBoard(text)
-    beforeTranslation = gameBoard.toString()
-    gameBoard.importBoard(beforeTranslation)
-    afterTranslation = gameBoard.toString()
+    beforeTranslation = testBoard.toString()
+    testBoard.importBoard(beforeTranslation)
+    afterTranslation = testBoard.toString()
     print("  expect True:")
     print("    ", beforeTranslation == afterTranslation)
 
 
 def testRobotsImported():
     print("testRobotsImported")
-    gameBoard = Board()
-    fp = open('boardWithRobots.txt', 'r')
-    text = fp.read()
-
-    gameBoard.importBoard(text)
-    # print(gameBoard.toString())
+    testBoard = getTestBoard()
     expectedRobots = {
         RobotEnum.RED: (1, 25),
         RobotEnum.BLUE: (1, 26),
@@ -55,16 +56,42 @@ def testRobotsImported():
         RobotEnum.BLACK: (31, 30),
     }
     print("  expect True:")
-    print("    ", gameBoard.robots == expectedRobots)
+    print("    ", testBoard.robots == expectedRobots)
 
 
 def testIsMoveValid():
-    pass
+    print("testIsMoveValid")
+    testBoard = getTestBoard()
+    print("  expect True:")
+    print("    ", testBoard.isMoveValid(RobotEnum.RED, DirEnum.DOWN))
+    print("    ", testBoard.isMoveValid(RobotEnum.BLUE, DirEnum.DOWN))
+    print("    ", testBoard.isMoveValid(RobotEnum.BLUE, DirEnum.RIGHT))
+    print("    ", testBoard.isMoveValid(RobotEnum.GREEN, DirEnum.UP))
+    print("    ", testBoard.isMoveValid(RobotEnum.GREEN, DirEnum.DOWN))
+    print("    ", testBoard.isMoveValid(RobotEnum.GREEN, DirEnum.LEFT))
+    print("    ", testBoard.isMoveValid(RobotEnum.YELLOW, DirEnum.UP))
+    print("    ", testBoard.isMoveValid(RobotEnum.YELLOW, DirEnum.DOWN))
+    print("    ", testBoard.isMoveValid(RobotEnum.YELLOW, DirEnum.RIGHT))
+    print("    ", testBoard.isMoveValid(RobotEnum.BLACK, DirEnum.UP))
+    print("    ", testBoard.isMoveValid(RobotEnum.BLACK, DirEnum.LEFT))
+    print("    ", testBoard.isMoveValid(RobotEnum.BLACK, DirEnum.RIGHT))
+
+    print("  expect False:")
+    print("    ", testBoard.isMoveValid(RobotEnum.RED, DirEnum.UP))
+    print("    ", testBoard.isMoveValid(RobotEnum.RED, DirEnum.LEFT))
+    print("    ", testBoard.isMoveValid(RobotEnum.RED, DirEnum.RIGHT))
+    print("    ", testBoard.isMoveValid(RobotEnum.BLUE, DirEnum.UP))
+    print("    ", testBoard.isMoveValid(RobotEnum.BLUE, DirEnum.LEFT))
+    print("    ", testBoard.isMoveValid(RobotEnum.GREEN, DirEnum.RIGHT))
+    print("    ", testBoard.isMoveValid(RobotEnum.YELLOW, DirEnum.LEFT))
+    print("    ", testBoard.isMoveValid(RobotEnum.BLACK, DirEnum.DOWN))
+
 
 def runAllTests():
     testRobotAndSymbolEnums()
     testBoardToStringInversion()
     testRobotsImported()
+    testIsMoveValid()
 
 
 runAllTests()
