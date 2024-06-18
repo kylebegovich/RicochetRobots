@@ -1,4 +1,5 @@
-from model import *
+from model import Board
+from enums import TileEnum, SymbolEnum, DirEnum, RobotEnum
 
 
 def getTestBoard():
