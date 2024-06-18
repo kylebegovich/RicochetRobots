@@ -71,15 +71,26 @@ class RobotEnum(Enum):
 
 
 class TileState:
-    def __init__(self, enum, value=None):
+    def __init__(self, enum, value=None, position=None, robot=None):
         self.enum = enum
         self.value = value
-    
+        self.position = position
+        self.robot = robot
+
     def getEnum(self):
         return self.enum
-    
+
     def getValue(self):
         return self.value
+    
+    def getPosition(self):
+        return self.position
+    
+    def getRobot(self):
+        return self.robot
+
+    def setRobot(self, robot):
+        self.robot = robot
 
 
 class Board:
@@ -118,27 +129,27 @@ class Board:
             boardRow = []
             for col, char in enumerate(strRow):
                 if char == "X" or char == "1":
-                    boardRow.append(TileState(TileEnum.WALL))
+                    boardRow.append(TileState(enum=TileEnum.WALL, position=(row, col)))
                 elif char == " " or char == "0":
-                    boardRow.append(TileState(TileEnum.EMPTY))
+                    boardRow.append(TileState(enum=TileEnum.EMPTY, position=(row, col)))
                 elif char == "5" or char == "🔴":
                     self.robots[RobotEnum.RED] = (row, col)
-                    boardRow.append(TileState(TileEnum.EMPTY))
+                    boardRow.append(TileState(enum=TileEnum.EMPTY, position=(row, col), robot=RobotEnum.RED))
                 elif char == "6" or char == "🔵":
                     self.robots[RobotEnum.BLUE] = (row, col)
-                    boardRow.append(TileState(TileEnum.EMPTY))
+                    boardRow.append(TileState(enum=TileEnum.EMPTY, position=(row, col), robot=RobotEnum.BLUE))
                 elif char == "7" or char == "🟢":
                     self.robots[RobotEnum.GREEN] = (row, col)
-                    boardRow.append(TileState(TileEnum.EMPTY))
+                    boardRow.append(TileState(enum=TileEnum.EMPTY, position=(row, col), robot=RobotEnum.GREEN))
                 elif char == "8" or char == "🟡":
                     self.robots[RobotEnum.YELLOW] = (row, col)
-                    boardRow.append(TileState(TileEnum.EMPTY))
+                    boardRow.append(TileState(enum=TileEnum.EMPTY, position=(row, col), robot=RobotEnum.YELLOW))
                 elif char == "9" or char == "⚫":
                     self.robots[RobotEnum.BLACK] = (row, col)
-                    boardRow.append(TileState(TileEnum.EMPTY))
+                    boardRow.append(TileState(enum=TileEnum.EMPTY, position=(row, col), robot=RobotEnum.BLACK))
                 elif ord(char) >= ord("A") and ord(char) <= ord("Z"):
                     enumIdx = ord(char) - ord("A") + 1
-                    boardRow.append(TileState(TileEnum.SYMBOL, SymbolEnum(enumIdx)))
+                    boardRow.append(TileState(enum=TileEnum.SYMBOL, value=SymbolEnum(enumIdx), position=(row, col)))
 
             # handle newline at the end of files, whitespace lines, etc.
             if len(boardRow) > 0:
@@ -196,15 +207,13 @@ class Board:
         return output
 
 
-    def isMoveValid(self, robotEnum, dirEnum):
-        if type(robotEnum) != RobotEnum or type(dirEnum) != DirEnum:
+    def getAdjacentTileState(self, position, dirEnum):
+        if type(dirEnum) != DirEnum:
             return None
-        
-        if robotEnum not in self.robots:
-            return None
-        (row, col) = self.robots[robotEnum]
 
-        # robot off the board
+        row = position[0]
+        col = position[1]
+        # pos off the board
         if row < 1 or row >= self.SIZE or col < 1 or col >= self.SIZE:
             return None
         
@@ -218,14 +227,44 @@ class Board:
         elif dirEnum == DirEnum.RIGHT:
             adjTilePos[1] += 1
 
-        adjTile = self.board[adjTilePos[0]][adjTilePos[1]]
+        return self.board[adjTilePos[0]][adjTilePos[1]]
+
+
+    def isMoveValid(self, robotEnum, dirEnum):
+        if type(robotEnum) != RobotEnum:
+            return None
+        
+        if robotEnum not in self.robots:
+            return None
+        position = self.robots[robotEnum]
+
+        adjTileState = self.getAdjacentTileState(position, dirEnum)
         # blocked by a wall
-        if adjTile.enum == TileEnum.WALL:
+        if adjTileState.enum == TileEnum.WALL:
             return False
         
         for pos in self.robots.values():
             # blocked by robot
-            if adjTilePos[0] == pos[0] and adjTilePos[1] == pos[1]:
+            if adjTileState.position[0] == pos[0] and adjTileState.position[1] == pos[1]:
                 return False
             
         return True
+    
+
+    def moveRobot(self, robotEnum, dirEnum):
+        if not self.isMoveValid(robotEnum, dirEnum):
+            return None
+        
+        startPos = self.robots[robotEnum]
+        startTile = self.board[startPos[0]][startPos[1]]
+        currPos = startPos
+        adjTile = self.getAdjacentTileState(currPos, dirEnum)
+        while adjTile.enum != TileEnum.WALL and adjTile.robot is None:
+            tempPos = adjTile.position
+            adjTile = self.getAdjacentTileState(tempPos, dirEnum)
+            currPos = tempPos
+
+        startTile.setRobot(None)
+        destTile = self.board[currPos[0]][currPos[1]]
+        destTile.setRobot(robotEnum)
+        self.robots[robotEnum] = destTile.position

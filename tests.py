@@ -62,6 +62,7 @@ def testRobotsImported():
 def testIsMoveValid():
     print("testIsMoveValid")
     testBoard = getTestBoard()
+
     print("  expect True:")
     print("    ", testBoard.isMoveValid(RobotEnum.RED, DirEnum.DOWN))
     print("    ", testBoard.isMoveValid(RobotEnum.BLUE, DirEnum.DOWN))
@@ -87,11 +88,44 @@ def testIsMoveValid():
     print("    ", testBoard.isMoveValid(RobotEnum.BLACK, DirEnum.DOWN))
 
 
+def testGetAdjacentTileState():
+    print("testGetAdjacentTileState")
+    testBoard = getTestBoard()
+    redPos = testBoard.robots[RobotEnum.RED]
+    bluePos = testBoard.robots[RobotEnum.BLUE]
+    print("  expect True:")
+    print("    ", testBoard.getAdjacentTileState(redPos, DirEnum.LEFT).getEnum() == TileEnum.WALL)
+    print("    ", testBoard.getAdjacentTileState(redPos, DirEnum.DOWN).getEnum() == TileEnum.EMPTY)
+    print("    ", testBoard.getAdjacentTileState(redPos, DirEnum.RIGHT).getEnum() == TileEnum.EMPTY)
+    print("    ", testBoard.getAdjacentTileState(redPos, DirEnum.RIGHT).getRobot() == RobotEnum.BLUE)
+    print("    ", testBoard.getAdjacentTileState(bluePos, DirEnum.LEFT).getEnum() == TileEnum.EMPTY)
+    print("    ", testBoard.getAdjacentTileState(bluePos, DirEnum.LEFT).getRobot() == RobotEnum.RED)
+
+
+def testMoveRobot():
+    print("testMoveRobot")
+    # TODO: test with assertions instead of just printing expected state
+#     testBoard = getTestBoard()
+#     print(testBoard.toString())
+#     testBoard.moveRobot(RobotEnum.BLUE, DirEnum.LEFT)
+#     testBoard.moveRobot(RobotEnum.RED, DirEnum.DOWN)
+#     testBoard.moveRobot(RobotEnum.BLUE, DirEnum.LEFT)
+#     testBoard.moveRobot(RobotEnum.BLUE, DirEnum.DOWN)
+#     testBoard.moveRobot(RobotEnum.BLUE, DirEnum.RIGHT)
+#     testBoard.moveRobot(RobotEnum.BLUE, DirEnum.UP)
+#     print(testBoard.toString())
+
+#     testBoard.moveRobot(RobotEnum.BLUE, DirEnum.LEFT)
+#     print(testBoard.toString())
+
+
 def runAllTests():
     testRobotAndSymbolEnums()
     testBoardToStringInversion()
     testRobotsImported()
     testIsMoveValid()
+    testGetAdjacentTileState()
+    testMoveRobot()
 
 
 runAllTests()
