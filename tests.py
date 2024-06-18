@@ -104,19 +104,26 @@ def testGetAdjacentTileState():
 
 def testMoveRobot():
     print("testMoveRobot")
-    # TODO: test with assertions instead of just printing expected state
-#     testBoard = getTestBoard()
-#     print(testBoard.toString())
-#     testBoard.moveRobot(RobotEnum.BLUE, DirEnum.LEFT)
-#     testBoard.moveRobot(RobotEnum.RED, DirEnum.DOWN)
-#     testBoard.moveRobot(RobotEnum.BLUE, DirEnum.LEFT)
-#     testBoard.moveRobot(RobotEnum.BLUE, DirEnum.DOWN)
-#     testBoard.moveRobot(RobotEnum.BLUE, DirEnum.RIGHT)
-#     testBoard.moveRobot(RobotEnum.BLUE, DirEnum.UP)
-#     print(testBoard.toString())
-
-#     testBoard.moveRobot(RobotEnum.BLUE, DirEnum.LEFT)
-#     print(testBoard.toString())
+    testBoard = getTestBoard()
+    print("  expect False:")
+    print("    ", testBoard.isTurnOver(SymbolEnum.WILDCARD))
+    print("    ", testBoard.isTurnOver(SymbolEnum.GREEN_TRIANGLE))
+    print("    ", testBoard.isTurnOver(SymbolEnum.RED_CIRCLE))
+    testBoard.moveRobot(RobotEnum.GREEN, DirEnum.LEFT)
+    testBoard.moveRobot(RobotEnum.GREEN, DirEnum.DOWN)
+    testBoard.moveRobot(RobotEnum.GREEN, DirEnum.LEFT)
+    print("    ", testBoard.isTurnOver(SymbolEnum.RED_TRIANGLE))
+    testBoard.moveRobot(RobotEnum.RED, DirEnum.DOWN)
+    testBoard.moveRobot(RobotEnum.RED, DirEnum.LEFT)
+    testBoard.moveRobot(RobotEnum.RED, DirEnum.UP)
+    print("    ", testBoard.isTurnOver(SymbolEnum.RED_TRIANGLE))
+    testBoard.moveRobot(RobotEnum.RED, DirEnum.LEFT)
+    print("  expect True:")
+    print("    ", testBoard.isTurnOver(SymbolEnum.RED_TRIANGLE))
+    print("  expect False:")
+    print("    ", testBoard.isTurnOver(SymbolEnum.WILDCARD))
+    print("    ", testBoard.isTurnOver(SymbolEnum.GREEN_TRIANGLE))
+    print("    ", testBoard.isTurnOver(SymbolEnum.RED_CIRCLE))
 
 
 def runAllTests():

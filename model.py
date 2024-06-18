@@ -39,20 +39,24 @@ class SymbolEnum(Enum):
     def toString(self):
         return chr(self.value + ord("A") - 1)
     
+    def matchingRobot(self):
+        if self == self.RED_CIRCLE or self == self.RED_TRIANGLE or self == self.RED_SQUARE or self == self.RED_HEXAGON:
+            return RobotEnum.RED
+        if self == self.BLUE_CIRCLE or self == self.BLUE_TRIANGLE or self == self.BLUE_SQUARE or self == self.BLUE_HEXAGON:
+            return RobotEnum.BLUE
+        if self == self.GREEN_CIRCLE or self == self.GREEN_TRIANGLE or self == self.GREEN_SQUARE or self == self.GREEN_HEXAGON:
+            return RobotEnum.GREEN
+        if self == self.YELLOW_CIRCLE or self == self.YELLOW_TRIANGLE or self == self.YELLOW_SQUARE or self == self.YELLOW_HEXAGON:
+            return RobotEnum.YELLOW
+        
+    
     def matchesRobot(self, robotEnum):
         if type(robotEnum) is not RobotEnum:
             return None
         
-        if robotEnum == RobotEnum.RED:
-            return self == self.RED_CIRCLE or self == self.RED_TRIANGLE or self == self.RED_SQUARE or self == self.RED_HEXAGON
-        if robotEnum == RobotEnum.BLUE:
-            return self == self.BLUE_CIRCLE or self == self.BLUE_TRIANGLE or self == self.BLUE_SQUARE or self == self.BLUE_HEXAGON
-        if robotEnum == RobotEnum.GREEN:
-            return self == self.GREEN_CIRCLE or self == self.GREEN_TRIANGLE or self == self.GREEN_SQUARE or self == self.GREEN_HEXAGON
-        if robotEnum == RobotEnum.YELLOW:
-            return self == self.YELLOW_CIRCLE or self == self.YELLOW_TRIANGLE or self == self.YELLOW_SQUARE or self == self.YELLOW_HEXAGON
-        
-        return None
+        if self == self.WILDCARD:
+            return True
+        return robotEnum == self.matchingRobot()
 
 
 class RobotEnum(Enum):
@@ -91,6 +95,13 @@ class TileState:
 
     def setRobot(self, robot):
         self.robot = robot
+
+    def robotMatchesDestination(self):
+        if self.value is None or self.robot is None:
+            return False
+        
+        if self.value.matchesRobot(self.robot):
+            return self.value
 
 
 class Board:
@@ -268,3 +279,11 @@ class Board:
         destTile = self.board[currPos[0]][currPos[1]]
         destTile.setRobot(robotEnum)
         self.robots[robotEnum] = destTile.position
+
+    
+    def isTurnOver(self, destinationSymbol):
+        for pos in self.robots.values():
+            tile = self.board[pos[0]][pos[1]]
+            if tile.enum == TileEnum.SYMBOL and tile.value is not None and tile.value == destinationSymbol:
+                return tile.robotMatchesDestination() == destinationSymbol
+        return False
