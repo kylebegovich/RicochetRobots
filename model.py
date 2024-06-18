@@ -196,8 +196,36 @@ class Board:
         return output
 
 
-    # def isMoveValid(self, robotEnum, dirEnum):
-    #     if type(robotEnum) != RobotEnum or type(dirEnum) != DirEnum:
-    #         return None
+    def isMoveValid(self, robotEnum, dirEnum):
+        if type(robotEnum) != RobotEnum or type(dirEnum) != DirEnum:
+            return None
         
-    #     robotPos = self.robots[robotEnum]
+        if robotEnum not in self.robots:
+            return None
+        (row, col) = self.robots[robotEnum]
+
+        # robot off the board
+        if row < 1 or row >= self.SIZE or col < 1 or col >= self.SIZE:
+            return None
+        
+        adjTilePos = (row, col)
+        if dirEnum == DirEnum.UP:
+            adjTilePos[0] -= 1
+        elif dirEnum == DirEnum.DOWN:
+            adjTilePos[0] += 1
+        elif dirEnum == DirEnum.LEFT:
+            adjTilePos[1] -= 1
+        elif dirEnum == DirEnum.RIGHT:
+            adjTilePos[1] += 1
+
+        adjTile = self.board[adjTilePos[0]][adjTilePos[1]]
+        # blocked by a wall
+        if adjTile == TileEnum.WALL:
+            return False
+        
+        for pos in self.robots.values():
+            # blocked by robot
+            if adjTilePos[0] == pos[0] and adjTilePos[1] == pos[1]:
+                return False
+            
+        return True

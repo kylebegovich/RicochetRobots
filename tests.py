@@ -39,21 +39,32 @@ def testBoardToStringInversion():
     print("    ", beforeTranslation == afterTranslation)
 
 
-# def testRobotsImported():
-#     print("testRobotsImported")
-#     gameBoard = Board()
-#     fp = open('boardWithRobots.txt', 'r')
-#     text = fp.read()
+def testRobotsImported():
+    print("testRobotsImported")
+    gameBoard = Board()
+    fp = open('boardWithRobots.txt', 'r')
+    text = fp.read()
 
-#     gameBoard.importBoard(text)
-#     print(gameBoard.toString())
+    gameBoard.importBoard(text)
+    # print(gameBoard.toString())
+    expectedRobots = {
+        RobotEnum.RED: (1, 25),
+        RobotEnum.BLUE: (1, 26),
+        RobotEnum.GREEN: (2, 31),
+        RobotEnum.YELLOW: (30, 1),
+        RobotEnum.BLACK: (31, 30),
+    }
+    print("  expect True:")
+    print("    ", gameBoard.robots == expectedRobots)
 
 
+def testIsMoveValid():
+    pass
 
 def runAllTests():
     testRobotAndSymbolEnums()
     testBoardToStringInversion()
-    # testRobotsImported()
+    testRobotsImported()
 
 
 runAllTests()
