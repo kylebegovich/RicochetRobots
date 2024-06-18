@@ -30,6 +30,21 @@ class SymbolEnum(Enum):
 
     def toString(self):
         return chr(self.value + ord("A") - 1)
+    
+    def matchesRobot(self, robotEnum):
+        if type(robotEnum) is not RobotEnum:
+            return None
+        
+        if robotEnum == RobotEnum.RED:
+            return self == self.RED_CIRCLE or self == self.RED_TRIANGLE or self == self.RED_SQUARE or self == self.RED_HEXAGON
+        if robotEnum == RobotEnum.BLUE:
+            return self == self.BLUE_CIRCLE or self == self.BLUE_TRIANGLE or self == self.BLUE_SQUARE or self == self.BLUE_HEXAGON
+        if robotEnum == RobotEnum.GREEN:
+            return self == self.GREEN_CIRCLE or self == self.GREEN_TRIANGLE or self == self.GREEN_SQUARE or self == self.GREEN_HEXAGON
+        if robotEnum == RobotEnum.YELLOW:
+            return self == self.YELLOW_CIRCLE or self == self.YELLOW_TRIANGLE or self == self.YELLOW_SQUARE or self == self.YELLOW_HEXAGON
+        
+        return None
 
 
 class RobotEnum(Enum):
@@ -39,6 +54,35 @@ class RobotEnum(Enum):
     GREEN = 3
     YELLOW = 4
     BLACK = 5
+
+    def matchesSymbol(self, symbolEnum):
+        if type(symbolEnum) is not SymbolEnum:
+            return None
+        
+        return symbolEnum.matchesRobot(self)
+    
+
+def testRobotAndSymbolEnums():
+    print("expect True:")
+    print("  ", SymbolEnum.RED_CIRCLE.matchesRobot(RobotEnum.RED))
+    print("  ", SymbolEnum.BLUE_TRIANGLE.matchesRobot(RobotEnum.BLUE))
+    print("  ", SymbolEnum.GREEN_SQUARE.matchesRobot(RobotEnum.GREEN))
+    print("  ", SymbolEnum.YELLOW_HEXAGON.matchesRobot(RobotEnum.YELLOW))
+    print("  ", RobotEnum.RED.matchesSymbol(SymbolEnum.RED_SQUARE))
+    print("  ", RobotEnum.BLUE.matchesSymbol(SymbolEnum.BLUE_HEXAGON))
+    print("  ", RobotEnum.GREEN.matchesSymbol(SymbolEnum.GREEN_CIRCLE))
+    print("  ", RobotEnum.YELLOW.matchesSymbol(SymbolEnum.YELLOW_TRIANGLE))
+
+
+    print("expect False:")
+    print("  ", SymbolEnum.RED_CIRCLE.matchesRobot(RobotEnum.BLUE))
+    print("  ", SymbolEnum.BLUE_TRIANGLE.matchesRobot(RobotEnum.GREEN))
+    print("  ", SymbolEnum.GREEN_SQUARE.matchesRobot(RobotEnum.YELLOW))
+    print("  ", SymbolEnum.YELLOW_HEXAGON.matchesRobot(RobotEnum.RED))
+    print("  ", RobotEnum.GREEN.matchesSymbol(SymbolEnum.RED_SQUARE))
+    print("  ", RobotEnum.YELLOW.matchesSymbol(SymbolEnum.BLUE_HEXAGON))
+    print("  ", RobotEnum.BLUE.matchesSymbol(SymbolEnum.GREEN_CIRCLE))
+    print("  ", RobotEnum.RED.matchesSymbol(SymbolEnum.YELLOW_TRIANGLE))
 
 
 class TileState:
@@ -63,14 +107,15 @@ class Board:
     1: wall
     A-Q: symbol tokens (A -> SymbolEnum 1, B -> SymbolEnum 2, etc.) 
     """
-
     SIZE = 33
 
     def __init__(self):
         self.board = self._blankBoard()
         self.robots = {}  # a map of robot by enum to their location (row, col) on the board
 
+
     def _blankBoard(self):
+        # define a blank board for designing new board directions
         board = []
         allWallRow = [TileState(TileEnum.WALL)] * Board.SIZE
         edgeWallRow = [TileState(TileEnum.WALL)] + ([TileState(TileEnum.EMPTY)] * (Board.SIZE - 2)) + [TileState(TileEnum.WALL)]
@@ -82,6 +127,7 @@ class Board:
     
 
     def importBoard(self, stringBoard):
+        # Takes stringBoard in a few formats, inverse of toString
         board = []
         for strRow in stringBoard.split("\n"):
             boardRow = []
@@ -95,6 +141,7 @@ class Board:
                     boardRow.append(TileState(TileEnum.SYMBOL, SymbolEnum(enumIdx)))
             board.append(boardRow)
 
+        # both write to self state and returns new board
         self.board = board
         return board
 
