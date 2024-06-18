@@ -121,17 +121,20 @@ class Board:
                     boardRow.append(TileState(TileEnum.WALL))
                 elif char == " " or char == "0":
                     boardRow.append(TileState(TileEnum.EMPTY))
-                elif ord(char) >= ord("5") and ord(char) <= ord("9"):
-                    if char == "5":
-                        self.robots[RobotEnum.RED] = (row, col)
-                    elif char == "6":
-                        self.robots[RobotEnum.BLUE] = (row, col)
-                    elif char == "7":
-                        self.robots[RobotEnum.GREEN] = (row, col)
-                    elif char == "8":
-                        self.robots[RobotEnum.YELLOW] = (row, col)
-                    elif char == "9":
-                        self.robots[RobotEnum.BLACK] = (row, col)
+                elif char == "5" or char == "🔴":
+                    self.robots[RobotEnum.RED] = (row, col)
+                    boardRow.append(TileState(TileEnum.EMPTY))
+                elif char == "6" or char == "🔵":
+                    self.robots[RobotEnum.BLUE] = (row, col)
+                    boardRow.append(TileState(TileEnum.EMPTY))
+                elif char == "7" or char == "🟢":
+                    self.robots[RobotEnum.GREEN] = (row, col)
+                    boardRow.append(TileState(TileEnum.EMPTY))
+                elif char == "8" or char == "🟡":
+                    self.robots[RobotEnum.YELLOW] = (row, col)
+                    boardRow.append(TileState(TileEnum.EMPTY))
+                elif char == "9" or char == "⚫":
+                    self.robots[RobotEnum.BLACK] = (row, col)
                     boardRow.append(TileState(TileEnum.EMPTY))
                 elif ord(char) >= ord("A") and ord(char) <= ord("Z"):
                     enumIdx = ord(char) - ord("A") + 1
@@ -160,7 +163,35 @@ class Board:
                     outputRow += tile.getValue().toString()
             output += outputRow + "\n"
 
-        # TODO: print robots
+        for robotEnum, position in self.robots.items():
+            row = position[0]
+            col = position[1]
+            strPos = row * (self.SIZE+1) + col
+            symbol = None
+            if robotEnum == RobotEnum.RED:
+                symbol = "5"
+            elif robotEnum == RobotEnum.BLUE:
+                symbol = "6"
+            elif robotEnum == RobotEnum.GREEN:
+                symbol = "7"
+            elif robotEnum == RobotEnum.YELLOW:
+                symbol = "8"
+            elif robotEnum == RobotEnum.BLACK:
+                symbol = "9"
+
+            # TODO: if possible, use emoji like below that's still monospaced
+            # if robotEnum == RobotEnum.RED:
+            #     symbol = "🔴"
+            # elif robotEnum == RobotEnum.BLUE:
+            #     symbol = "🔵"
+            # elif robotEnum == RobotEnum.GREEN:
+            #     symbol = "🟢"
+            # elif robotEnum == RobotEnum.YELLOW:
+            #     symbol = "🟡"
+            # elif robotEnum == RobotEnum.BLACK:
+            #     symbol = "⚫"
+
+            output = output[:strPos] + symbol + output[strPos+1:]
 
         return output
 
