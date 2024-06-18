@@ -8,6 +8,14 @@ class TileEnum(Enum):
     SYMBOL = 3
 
 
+class DirEnum(Enum):
+    UNDEFINED = 0
+    UP = 1
+    DOWN = 2
+    LEFT = 3
+    RIGHT = 4
+
+
 class SymbolEnum(Enum):
     UNDEFINED = 0
     RED_CIRCLE = 1
@@ -60,29 +68,6 @@ class RobotEnum(Enum):
             return None
         
         return symbolEnum.matchesRobot(self)
-    
-
-def testRobotAndSymbolEnums():
-    print("expect True:")
-    print("  ", SymbolEnum.RED_CIRCLE.matchesRobot(RobotEnum.RED))
-    print("  ", SymbolEnum.BLUE_TRIANGLE.matchesRobot(RobotEnum.BLUE))
-    print("  ", SymbolEnum.GREEN_SQUARE.matchesRobot(RobotEnum.GREEN))
-    print("  ", SymbolEnum.YELLOW_HEXAGON.matchesRobot(RobotEnum.YELLOW))
-    print("  ", RobotEnum.RED.matchesSymbol(SymbolEnum.RED_SQUARE))
-    print("  ", RobotEnum.BLUE.matchesSymbol(SymbolEnum.BLUE_HEXAGON))
-    print("  ", RobotEnum.GREEN.matchesSymbol(SymbolEnum.GREEN_CIRCLE))
-    print("  ", RobotEnum.YELLOW.matchesSymbol(SymbolEnum.YELLOW_TRIANGLE))
-
-
-    print("expect False:")
-    print("  ", SymbolEnum.RED_CIRCLE.matchesRobot(RobotEnum.BLUE))
-    print("  ", SymbolEnum.BLUE_TRIANGLE.matchesRobot(RobotEnum.GREEN))
-    print("  ", SymbolEnum.GREEN_SQUARE.matchesRobot(RobotEnum.YELLOW))
-    print("  ", SymbolEnum.YELLOW_HEXAGON.matchesRobot(RobotEnum.RED))
-    print("  ", RobotEnum.GREEN.matchesSymbol(SymbolEnum.RED_SQUARE))
-    print("  ", RobotEnum.YELLOW.matchesSymbol(SymbolEnum.BLUE_HEXAGON))
-    print("  ", RobotEnum.BLUE.matchesSymbol(SymbolEnum.GREEN_CIRCLE))
-    print("  ", RobotEnum.RED.matchesSymbol(SymbolEnum.YELLOW_TRIANGLE))
 
 
 class TileState:
@@ -129,17 +114,32 @@ class Board:
     def importBoard(self, stringBoard):
         # Takes stringBoard in a few formats, inverse of toString
         board = []
-        for strRow in stringBoard.split("\n"):
+        for row, strRow in enumerate(stringBoard.split("\n")):
             boardRow = []
-            for char in strRow:
+            for col, char in enumerate(strRow):
                 if char == "X" or char == "1":
                     boardRow.append(TileState(TileEnum.WALL))
                 elif char == " " or char == "0":
                     boardRow.append(TileState(TileEnum.EMPTY))
-                else:
+                elif ord(char) >= ord("5") and ord(char) <= ord("9"):
+                    if char == "5":
+                        self.robots[RobotEnum.RED] = (row, col)
+                    elif char == "6":
+                        self.robots[RobotEnum.BLUE] = (row, col)
+                    elif char == "7":
+                        self.robots[RobotEnum.GREEN] = (row, col)
+                    elif char == "8":
+                        self.robots[RobotEnum.YELLOW] = (row, col)
+                    elif char == "9":
+                        self.robots[RobotEnum.BLACK] = (row, col)
+                    boardRow.append(TileState(TileEnum.EMPTY))
+                elif ord(char) >= ord("A") and ord(char) <= ord("Z"):
                     enumIdx = ord(char) - ord("A") + 1
                     boardRow.append(TileState(TileEnum.SYMBOL, SymbolEnum(enumIdx)))
-            board.append(boardRow)
+
+            # handle newline at the end of files, whitespace lines, etc.
+            if len(boardRow) > 0:
+                board.append(boardRow)
 
         # both write to self state and returns new board
         self.board = board
@@ -160,13 +160,13 @@ class Board:
                     outputRow += tile.getValue().toString()
             output += outputRow + "\n"
 
+        # TODO: print robots
+
         return output
 
 
-gameBoard = Board()
-
-fp = open('board.txt', 'r')
-text = fp.read()
-
-gameBoard.importBoard(text)
-print(gameBoard.toString())
+    # def isMoveValid(self, robotEnum, dirEnum):
+    #     if type(robotEnum) != RobotEnum or type(dirEnum) != DirEnum:
+    #         return None
+        
+    #     robotPos = self.robots[robotEnum]
